@@ -1,38 +1,60 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Project - README
+
+This is a Next.js project that uses a PostgreSQL database to manage to-do items. This README provides instructions on how to set up the project locally and connect it to a PostgreSQL database.
+
+## Technical Audience
+
+This README is intended for technical users who are familiar with Node.js, PostgreSQL, and the command line interface.
+
+## Prerequisites
+
+Before running this project, you will need the following installed on your system:
+
+- Node.js
+- npm or yarn
+- PostgreSQL
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository to your local machine.
+2. Open a terminal and navigate to the project directory.
+3. In the terminal, run `npm install` or `yarn` to install the project dependencies.
+4. Create a new PostgreSQL database for this project.
+5. Set the following environment variables in the project root directory:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+```
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=your_database_name
+PGUSER=your_database_username
+PGPASSWORD=your_database_password
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Replace `your_database_name`, `your_database_username`, and `your_database_password` with the appropriate values for your PostgreSQL database.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+6. In the terminal, run `npm run dev` or `yarn dev` to start the development server.
+7. Open a web browser and navigate to `http://localhost:3000` to view the running application.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Available Scripts
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+In the project directory, you can run the following commands:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### `npm run dev` or `yarn dev`
 
-## Learn More
+Runs the application in development mode. Open http://localhost:3000 to view it in the browser. The page will automatically reload if you make changes to the code.
 
-To learn more about Next.js, take a look at the following resources:
+### `npm run build` or `yarn build`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Builds the application for production usage.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### `npm start` or `yarn start`
 
-## Deploy on Vercel
+Starts the application in production mode. The application must be built before running this command.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### `npm run lint` or `yarn lint`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Runs the linter to check for any syntax or code style issues.
+
+## Conclusion
+
+This README provides an overview of how to set up this Next.js project locally and connect it to a PostgreSQL database. With these instructions, you should be able to get the project up and running on your own machine.
