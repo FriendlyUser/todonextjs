@@ -10,10 +10,18 @@ const pool = new Pool({
   password: process.env.PGPASSWORD,
   connectionString: process.env.DATABASE_URL,
 });
-type Data = {
+
+interface TodoItem {
+  id: number,
+  text: string,
+  completed: boolean
+}
+
+interface ErrorMessage {
   message: string
 }
 
+type Data = TodoItem[] | ErrorMessage
 
 export default async function handler(
   req: NextApiRequest,
