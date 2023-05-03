@@ -10,7 +10,7 @@ export default async function handler(
 ) {
   try {
     let numArgs = 1;
-    const { search, completed, size  } = req.query;
+    const { search, completed, size } = req.query;
     let query = 'SELECT * FROM todo WHERE';
     const values = [];
 
@@ -34,10 +34,8 @@ export default async function handler(
 
     
     if (size) {
-        query += ` LIMIT $${numArgs}`;
-        values.push(size);
+        query += ` LIMIT ${size}`;
       }
-
     const { rows } = await pool.query(query, values);
     res.status(200).json(rows);
   } catch (error) {
