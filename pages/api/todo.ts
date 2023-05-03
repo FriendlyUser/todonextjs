@@ -48,7 +48,6 @@ export default async function handler(
       try {
         const { id } = req.query;
         const { completed } = req.body;
-        console.log("completed", completed)
         const data = await pool.query('UPDATE todo SET completed = $1 WHERE id = $2', [ completed, id]);
         // console.log("rows", data);
         res.status(200).json(data as any);
