@@ -32,6 +32,17 @@ PGPASSWORD=your_database_password
 
 Replace `your_database_name`, `your_database_username`, and `your_database_password` with the appropriate values for your PostgreSQL database.
 
+Ensure that the database has a table called `todo` on it
+
+```sql
+CREATE TABLE todo (
+  id SERIAL PRIMARY KEY,
+  text TEXT NOT NULL,
+  completed BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+```
+
 6. In the terminal, run `npm run dev` or `yarn dev` to start the development server.
 7. Open a web browser and navigate to `http://localhost:3000` to view the running application.
 

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Accordion from '@mui/material/Accordion';
+import useSWR, { useSWRConfig } from 'swr';
 import classes from './index.module.css';
 
 interface TodoItem {
@@ -27,6 +28,8 @@ const App = () => {
   const [doneItems, setDoneItems] = useState<TodoItem[]>([]);
   const [todoItemText, setTodoItemText] = useState(''); // text of the new to-do item [controlled component
   const [searchText, setSearchText] = useState('');
+
+  const { mutate } = useSWRConfig()
 
   const fetchIncompleteItems = async () => {
     try {
@@ -62,6 +65,17 @@ const App = () => {
     fetchDoneItems();
   }, []);
 
+  const fetchResults = (url: string): Promise<TodoItem[]> => {
+    return fetch(url).then((res) => res.json());
+  }
+
+  const { data: incompleteResults = [] } = useSWR(`/api/search?completed=false${searchText ? `&search=${searchText}` : ""}`, fetchResults)
+
+  const { data: completeResults = []} = useSWR(`/api/search?completed=true${searchText ? `&search=${searchText}` : ""}`, fetchResults)
+
+  
+  const firstTenCompleteResults = completeResults?.slice(0, 10);
+
   const handleAddTodoItem = async () => {
     try {
       const response = await fetch('/api/todo', {
@@ -78,6 +92,7 @@ const App = () => {
         throw new Error('Failed to add task');
       }
       const data = await response.json();
+      mutate(`/api/search?completed=false${searchText ? `&search=${searchText}` : ""}`);
       setTodoItems(todoItems => [...todoItems, data]);
       setTodoItemText('');
     } catch (error) {
@@ -92,7 +107,7 @@ const App = () => {
   const handleCheckboxChange = async (event: any, id: string) => {
     try {
       const { checked } = event.target;
-      const response = await fetch(`/api/todo/${id}`, {
+      const response = await fetch(`/api/todo?id=${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,11 +117,8 @@ const App = () => {
       if (!response.ok) {
         throw new Error('Failed to update task');
       }
-      const updatedItem = { ...todoItems.find((item: { id: string; }) => item.id === id), completed: checked };
-      setTodoItems((todoItems: any[]) => {
-        const itemIndex = todoItems.findIndex((item: { id: string; }) => item.id === id);
-        return [...todoItems.slice(0, itemIndex), updatedItem, ...todoItems.slice(itemIndex + 1)];
-      });
+      mutate(`/api/search?completed=false${searchText ? `&search=${searchText}` : ""}`);
+      mutate(`/api/search?completed=true${searchText ? `&search=${searchText}` : ""}`);
     } catch (error) {
       console.error(error);
       // Handle the error, such as displaying an error message to the user or retrying the request
@@ -123,6 +135,8 @@ const App = () => {
       }
       setTodoItems([]);
       setDoneItems([]);
+      mutate(`/api/search?completed=false${searchText ? `&search=${searchText}` : ""}`);
+      mutate(`/api/search?completed=true${searchText ? `&search=${searchText}` : ""}`);
     } catch (error) {
       console.error(error);
       // Handle the error, such as displaying an error message to the user or retrying the request
@@ -162,12 +176,13 @@ const App = () => {
                 />
               </div>
               </Paper>
+              <br />
               <Button type="button" variant="contained" color="primary" disabled={todoItemText === ""} onClick={() => {
                 handleAddTodoItem();
               }}>
                   Add
               </Button>
-              {todoItems?.map((item) => (
+              {incompleteResults?.map((item) => (
                 <div key={item.id}>
                   <FormControlLabel
                     control={<Checkbox checked={item.completed} onChange={(event) => handleCheckboxChange(event, item.id)} name="checked" />}
@@ -187,17 +202,17 @@ const App = () => {
                 value={searchText}
                 onChange={handleSearchTextChange}
               />
-              {doneItems?.map((item) => (
-                <div key={item.id}>
-                  <FormControlLabel
-                    control={<Checkbox checked={item.completed} name="checked" />}
-                    label={item.text}
-                    disabled
-                    className={classes.checkbox}
-                  />
-                </div>
-              ))}
             </Paper>
+            {completeResults?.map((item) => (
+              <div key={item.id}>
+                <FormControlLabel
+                  control={<Checkbox checked={item.completed} name="checked" onChange={(event) => handleCheckboxChange(event, item.id)}  />}
+                  label={item.text}
+                  // disabled
+                  className={classes.checkbox}
+                />
+              </div>
+            ))}
           </Grid>
         </Grid>
       </div>

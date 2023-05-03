@@ -1,25 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import pool from '@/utils/db';
+import { ErrorMessage, TodoItem } from '@/utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { Pool } from 'pg';
 
-const pool = new Pool({
-  host: process.env.PGHOST,
-  user: process.env.PGUSER,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  connectionString: process.env.DATABASE_URL,
-});
-
-interface TodoItem {
-  id: number,
-  text: string,
-  completed: boolean
-}
-
-interface ErrorMessage {
-  message: string
-}
 
 type Data = TodoItem[] | ErrorMessage
 
@@ -63,9 +47,11 @@ export default async function handler(
     case 'PUT':
       try {
         const { id } = req.query;
-        const { text, completed } = req.body;
-        const { rows } = await pool.query('UPDATE todo SET text = $1, completed = $2 WHERE id = $3 RETURNING id, text, completed', [text, completed, id]);
-        res.status(200).json(rows[0]);
+        const { completed } = req.body;
+        console.log("completed", completed)
+        const data = await pool.query('UPDATE todo SET completed = $1 WHERE id = $2', [ completed, id]);
+        // console.log("rows", data);
+        res.status(200).json(data as any);
       } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
