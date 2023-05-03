@@ -149,9 +149,9 @@ const App = () => {
       <br />
       <div className={classes.mainWrapper}>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} spacing={1}>
+          <Grid item xs={12} sm={6} >
             <Paper className={classes.paper}>
-              <div className={classes.form} onSubmit={handleAddTodoItem}>
+              <div className={classes.form}>
                 <TextField
                   label="Add new task"
                   variant="outlined"
@@ -162,7 +162,9 @@ const App = () => {
                 />
               </div>
               </Paper>
-              <Button type="submit" variant="contained" color="primary">
+              <Button type="button" variant="contained" color="primary" disabled={todoItemText === ""} onClick={() => {
+                handleAddTodoItem();
+              }}>
                   Add
               </Button>
               {todoItems?.map((item) => (

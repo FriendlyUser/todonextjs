@@ -49,6 +49,7 @@ export default async function handler(
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
       }
+      break;
     case 'POST':
       try {
         const { text, completed } = req.body;
