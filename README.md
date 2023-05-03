@@ -20,7 +20,7 @@ Before running this project, you will need the following installed on your syste
 2. Open a terminal and navigate to the project directory.
 3. In the terminal, run `npm install` or `yarn` to install the project dependencies.
 4. Create a new PostgreSQL database for this project.
-5. Set the following environment variables in the project root directory:
+5. Set the following environment variables in the `.env` file in your project root directory:
 
 ```
 PGHOST=localhost

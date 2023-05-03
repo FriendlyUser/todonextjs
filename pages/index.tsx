@@ -144,6 +144,7 @@ const App = () => {
   };
 
   return (
+    <>
     <div className={classes.root}>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static" className={classes.appBar}>
@@ -217,6 +218,7 @@ const App = () => {
         </Grid>
       </div>
     </div>
+    </>
   );
 };
 
