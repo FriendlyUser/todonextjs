@@ -34,7 +34,32 @@ const App = () => {
   const incompleteKey = `/api/search?completed=false${searchText ? `&search=${searchText}` : ""}`;
 
   const fetchResults = (url: string): Promise<TodoItem[]> => {
-    return fetch(url).then((res) => res.json());
+    return fetch(url)
+    .then((res) =>  {
+      // Handle HTTP errors
+      if (!res.ok) {
+        throw new Error('Failed to fetch tasks');
+      }
+      return res.json()
+    })
+    .then((data: TodoItem[]) => {
+      if (!data) {
+        return [];
+      }
+      // sort by text field
+      const sorted = data.sort((a, b) => {
+        const textA = a?.text?.toUpperCase();
+        const textB = b?.text?.toUpperCase();
+        if (textA < textB) {
+          return -1;
+        }
+        if (textA > textB) {
+          return 1;
+        }
+        return 0;
+      });
+      return sorted;
+    });
   }
 
   const { data: incompleteResults = [] } = useSWR(incompleteKey, fetchResults)
