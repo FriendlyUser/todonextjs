@@ -41,11 +41,10 @@ export default async function handler(
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
       }
-      break;
     case 'POST':
       try {
-        const { text } = req.body;
-        const { rows } = await pool.query('INSERT INTO todo (text, completed) VALUES ($1, $2) RETURNING *', [text, false]);
+        const { text, completed } = req.body;
+        const { rows } = await pool.query('INSERT INTO todo (text, completed) VALUES ($1, $2) RETURNING id, text, completed', [text, completed]);
         res.status(201).json(rows[0]);
       } catch (error) {
         console.error(error);
@@ -55,8 +54,8 @@ export default async function handler(
     case 'PUT':
       try {
         const { id } = req.query;
-        const { completed } = req.body;
-        const { rows } = await pool.query('UPDATE todo SET completed = $1 WHERE id = $2 RETURNING *', [completed, id]);
+        const { text, completed } = req.body;
+        const { rows } = await pool.query('UPDATE todo SET text = $1, completed = $2 WHERE id = $3 RETURNING id, text, completed', [text, completed, id]);
         res.status(200).json(rows[0]);
       } catch (error) {
         console.error(error);
@@ -66,7 +65,13 @@ export default async function handler(
     case 'DELETE':
       try {
         const { id } = req.query;
-        await pool.query('DELETE FROM todo WHERE id = $1', [id]);
+        let queryString = 'DELETE FROM todo';
+        let queryParams = [];
+        if (id) {
+          queryString += ' WHERE id = $1';
+          queryParams.push(id);
+        }
+        await pool.query(queryString, queryParams);
         res.status(204).end();
       } catch (error) {
         console.error(error);

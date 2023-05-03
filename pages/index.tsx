@@ -16,61 +16,117 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Accordion from '@mui/material/Accordion';
 import classes from './index.module.css';
 
+interface TodoItem {
+  id: string;
+  text: string;
+  completed: boolean;
+}
 const App = () => {
 
-  // const classes = makeStyles({
-  //   root: {
-  //     flexGrow: 1,
-  //   },
-  //   appBar: {
-  //     backgroundColor: '#fff',
-  //     color: '#000',
-  //   },
-  //   title: {
-  //     flexGrow: 1,
-  //   },
-  //   // paper: {
-  //   //   padding: theme.spacing(2),
-  //   //   color: theme.palette.text.secondary,
-  //   // },
-  //   // form: {
-  //   //   display: 'flex',
-  //   //   alignItems: 'center',
-  //   //   marginBottom: theme.spacing(2),
-  //   // },
-  //   // search: {
-  //   //   marginRight: theme.spacing(2),
-  //   // },
-  //   // checkbox: {
-  //   //   paddingRight: theme.spacing(1),
-  //   // },
-  //   deleteButton: {
-  //     marginLeft: 'auto',
-  //   },
-  // });
-  const [todoItems, setTodoItems] = useState<any>([]);
-  const [doneItems, setDoneItems] = useState<any>([]);
+  const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
+  const [doneItems, setDoneItems] = useState<TodoItem[]>([]);
   const [todoItemText, setTodoItemText] = useState(''); // text of the new to-do item [controlled component
   const [searchText, setSearchText] = useState('');
 
+  const fetchIncompleteItems = async () => {
+    try {
+      const resp =  await fetch('/api/todo?completed=false');
+      if (resp.status === 500) {
+        throw new Error('Internal Server Error');
+      }
+      const data = await resp.json();
+      setTodoItems(data)
+      return data;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+  const fetchDoneItems = async () => {
+    try {
+      const resp = await fetch('/api/todo?completed=true');
+      if (resp.status === 500) {
+        throw new Error('Internal Server Error');
+      }
+      const data = await resp.json();
+      setDoneItems(data)
+      return data;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
   useEffect(() => {
     // fetch to-do and done items from the API
+    fetchIncompleteItems();
+    fetchDoneItems();
   }, []);
 
-  const handleAddTodoItem = () => {
-    // add new to-do item to the API
+  const handleAddTodoItem = async () => {
+    try {
+      const response = await fetch('/api/todo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: todoItemText,
+          completed: false,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add task');
+      }
+      const data = await response.json();
+      setTodoItems(todoItems => [...todoItems, data]);
+      setTodoItemText('');
+    } catch (error) {
+      console.error(error);
+      // Handle the error, such as displaying an error message to the user or retrying the request
+    }
   };
-
   const handleSearchTextChange = (event: any) => {
     setSearchText(event.target.value);
   };
 
-  const handleCheckboxChange = (event, id) => {
-    // update the status of the item with the given id in the API
+  const handleCheckboxChange = async (event: any, id: string) => {
+    try {
+      const { checked } = event.target;
+      const response = await fetch(`/api/todo/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ completed: checked }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+      const updatedItem = { ...todoItems.find((item: { id: string; }) => item.id === id), completed: checked };
+      setTodoItems((todoItems: any[]) => {
+        const itemIndex = todoItems.findIndex((item: { id: string; }) => item.id === id);
+        return [...todoItems.slice(0, itemIndex), updatedItem, ...todoItems.slice(itemIndex + 1)];
+      });
+    } catch (error) {
+      console.error(error);
+      // Handle the error, such as displaying an error message to the user or retrying the request
+    }
   };
 
-  const handleDeleteAllTasksClick = () => {
-    // delete all tasks from the API
+  const handleDeleteAllTasksClick = async () => {
+    try {
+      const response = await fetch('/api/todo', {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete tasks');
+      }
+      setTodoItems([]);
+      setDoneItems([]);
+    } catch (error) {
+      console.error(error);
+      // Handle the error, such as displaying an error message to the user or retrying the request
+    }
   };
 
   return (
@@ -109,7 +165,7 @@ const App = () => {
               <Button type="submit" variant="contained" color="primary">
                   Add
               </Button>
-              {todoItems.map((item) => (
+              {todoItems?.map((item) => (
                 <div key={item.id}>
                   <FormControlLabel
                     control={<Checkbox checked={item.completed} onChange={(event) => handleCheckboxChange(event, item.id)} name="checked" />}
@@ -129,7 +185,7 @@ const App = () => {
                 value={searchText}
                 onChange={handleSearchTextChange}
               />
-              {doneItems.map((item) => (
+              {doneItems?.map((item) => (
                 <div key={item.id}>
                   <FormControlLabel
                     control={<Checkbox checked={item.completed} name="checked" />}
