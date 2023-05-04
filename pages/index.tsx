@@ -62,9 +62,13 @@ const App = () => {
     });
   }
 
-  const { data: incompleteResults = [] } = useSWR(incompleteKey, fetchResults)
+  // refresh every 60 seconds automatically
+  const fetcherOptions = {
+    refreshInterval: 1000*60,
+  }
+  const { data: incompleteResults = [] } = useSWR(incompleteKey, fetchResults, fetcherOptions)
 
-  const { data: completeResults = []} = useSWR(completeKey, fetchResults)
+  const { data: completeResults = []} = useSWR(completeKey, fetchResults, fetcherOptions)
 
   const handleAddTodoItem = async () => {
     try {
