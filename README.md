@@ -2,6 +2,7 @@
 
 This is a Next.js project that uses a PostgreSQL database to manage to-do items. This README provides instructions on how to set up the project locally and connect it to a PostgreSQL database.
 
+Available at https://todonextjs-six.vercel.app/
 ## Technical Audience
 
 This README is intended for technical users who are familiar with Node.js, PostgreSQL, and the command line interface.
